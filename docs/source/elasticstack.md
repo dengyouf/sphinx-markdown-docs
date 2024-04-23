@@ -353,12 +353,12 @@ nohup ./bin/cerebro &
 
 默认的访问地址为：http://IP:9000
 
-![cerebro.png](./images/cerebro.png)
+![cerebro.png](https://github.com/dengyouf/sphinx-markdown-docs/blob/sources/docs/source/images/cerebro.png?raw=true)
 
 
 ### Elasticsearch相关术语
 
-![elastic.png](./images/elastic.png)
+![elastic.png](https://github.com/dengyouf/sphinx-markdown-docs/blob/sources/docs/source/images/elastic.png?raw=true)
 
 **MySQL跟ElasticSearch对比**
 
