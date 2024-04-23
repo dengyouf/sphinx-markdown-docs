@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2. 日志采集 &mdash; SRE运维 v0.0.1 文档</title>
+  <title>1. 日志采集 &mdash; SRE运维 v0.0.1 文档</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,8 +21,7 @@
         <script src="_static/translations.js?v=beaddf03"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="索引" href="genindex.html" />
-    <link rel="search" title="搜索" href="search.html" />
-    <link rel="prev" title="1. Getting started" href="chapter1.html" /> 
+    <link rel="search" title="搜索" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,12 +45,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
               <p class="caption" role="heading"><span class="caption-text">运维文档</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="chapter1.html">1. Getting started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">2. 日志采集</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#elasticsearch">2.1. elasticsearch</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">2.1.1. 单点安装</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">2.1.2. 集群安装</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">2.1.3. 启动失败解决方案</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. 日志采集</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#elasticsearch">1.1. elasticsearch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">1.1.1. 单点安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">1.1.2. 集群安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">1.1.3. 启动失败解决方案</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cerebro">1.1.4. Cerebro 管理程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">1.1.5. Elasticsearch相关术语</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">1.1.6. 索引相关操作</a></li>
 </ul>
 </li>
 </ul>
@@ -72,7 +73,7 @@
           <div role="navigation" aria-label="页面导航">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active"><span class="section-number">2. </span>日志采集</li>
+      <li class="breadcrumb-item active"><span class="section-number">1. </span>日志采集</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/elasticstack.md.txt" rel="nofollow"> 查看页面源码</a>
       </li>
@@ -83,12 +84,21 @@
            <div itemprop="articleBody">
              
   <section id="id1">
-<h1><span class="section-number">2. </span>日志采集<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1><span class="section-number">1. </span>日志采集<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
 <!-- > <https://github.com/tchapi/markdown-cheatsheet> --><hr class="docutils" />
 <section id="elasticsearch">
-<h2><span class="section-number">2.1. </span>elasticsearch<a class="headerlink" href="#elasticsearch" title="Link to this heading"></a></h2>
+<h2><span class="section-number">1.1. </span>elasticsearch<a class="headerlink" href="#elasticsearch" title="Link to this heading"></a></h2>
+<p>elasticsearch 是一个高度可扩展的开源全文搜索和分析引擎，它可实现数据的实时全文搜索、支持分布式可实现高可用、提供 API 接口，可以处理大规模日志数据，比如 Nginx、Tomcat、系统日志等功能。Elasticsearch 使用 Java 语言开发，是建立在全文搜索引擎 Apache Lucene 基础之上的搜索引擎。</p>
+<p>Elasticsearch 的特点</p>
+<ul class="simple">
+<li><p>实时搜索、实时分析</p></li>
+<li><p>分布式架构、实时文件存储</p></li>
+<li><p>文档导向，所有对象都是文档</p></li>
+<li><p>高可用，易扩展，支持集群，分片与复制</p></li>
+<li><p>接口友好，支持 json</p></li>
+</ul>
 <section id="id2">
-<h3><span class="section-number">2.1.1. </span>单点安装<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<h3><span class="section-number">1.1.1. </span>单点安装<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p><strong>rpm 安装</strong></p>
 <ul class="simple">
 <li><p>下载软件包</p></li>
@@ -214,7 +224,7 @@
 </div>
 </section>
 <section id="id3">
-<h3><span class="section-number">2.1.2. </span>集群安装<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<h3><span class="section-number">1.1.2. </span>集群安装<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -339,7 +349,7 @@
 </div>
 </section>
 <section id="id4">
-<h3><span class="section-number">2.1.3. </span>启动失败解决方案<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<h3><span class="section-number">1.1.3. </span>启动失败解决方案<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>报错：<code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">file</span> <span class="pre">descriptors</span> <span class="pre">[4096]</span> <span class="pre">for</span> <span class="pre">elasticsearch</span> <span class="pre">process</span> <span class="pre">is</span> <span class="pre">too</span> <span class="pre">low,</span> <span class="pre">increase</span> <span class="pre">to</span> <span class="pre">at</span> <span class="pre">least</span> <span class="pre">[65535]</span></code></p></li>
 <li><p>解决方案：修改文件打开数量上线，修改后需要断开会话</p></li>
@@ -380,15 +390,124 @@
 </pre></div>
 </div>
 </section>
+<section id="cerebro">
+<h3><span class="section-number">1.1.4. </span>Cerebro 管理程序<a class="headerlink" href="#cerebro" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>官网： https://github.com/lmenezes/cerebro</p>
+</div></blockquote>
+<p>Cerebro 是一个开源的elsticsearch web 管理工具 ，需要 java1.8 或者更高版本。</p>
+<ul class="simple">
+<li><p>下载</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">lmenezes</span><span class="o">/</span><span class="n">cerebro</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">v0</span><span class="mf">.8.1</span><span class="o">/</span><span class="n">cerebro</span><span class="o">-</span><span class="mf">0.8.1</span><span class="o">.</span><span class="n">tgz</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>安装</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">tar</span> <span class="o">-</span><span class="n">xf</span> <span class="n">cerebro</span><span class="o">-</span><span class="mf">0.8.1</span><span class="o">.</span><span class="n">tgz</span> <span class="o">-</span><span class="n">C</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>配置</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">cd</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">cerebro</span><span class="o">-</span><span class="mf">0.8.1</span><span class="o">/</span>
+<span class="n">vim</span> <span class="n">conf</span><span class="o">/</span><span class="n">application</span><span class="o">.</span><span class="n">conf</span> 
+<span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">auth = {</span>
+<span class="s1">  type: basic</span>
+<span class="s1">    settings: {</span>
+<span class="s1">      username = &quot;admin&quot;</span>
+<span class="s1">      password = &quot;1234&quot;</span>
+<span class="s1">    }</span>
+<span class="s1">}</span>
+<span class="s1">...</span>
+<span class="s1">hosts = [</span>
+<span class="s1">  {</span>
+<span class="s1">    host = &quot;http://192.168.122.135:9200&quot;</span>
+<span class="s1">    name = &quot;dev-es7-cluster&quot;</span>
+<span class="s1">  #  headers-whitelist = [ &quot;x-proxy-user&quot;, &quot;x-proxy-roles&quot;, &quot;X-Forwarded-For&quot; ]</span>
+<span class="s1">  }</span>
+<span class="s1">  # Example of host with authentication</span>
+<span class="s1">  #{</span>
+<span class="s1">  #  host = &quot;http://some-authenticated-host:9200&quot;</span>
+<span class="s1">  #  name = &quot;Secured Cluster&quot;</span>
+<span class="s1">  #  auth = {</span>
+<span class="s1">  #    username = &quot;username&quot;</span>
+<span class="s1">  #    password = &quot;secret-password&quot;</span>
+<span class="s1">  #  }</span>
+<span class="s1">  #}</span>
+<span class="s1">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>启动服务</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nohup</span> <span class="o">./</span><span class="nb">bin</span><span class="o">/</span><span class="n">cerebro</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>访问web</p></li>
+</ul>
+<p>默认的访问地址为：http://IP:9000</p>
+<p><img alt="cerebro.png" src="_images/cerebro.png" /></p>
+</section>
+<section id="id5">
+<h3><span class="section-number">1.1.5. </span>Elasticsearch相关术语<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p><img alt="elastic.png" src="_images/elastic.png" /></p>
+<p><strong>MySQL跟ElasticSearch对比</strong></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Elasticsearch</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Index（索引）</td>
+<td>Datobase（数据库）</td>
+</tr>
+<tr>
+<td>Type（类型）</td>
+<td>Table（数据表）</td>
+</tr>
+<tr>
+<td>Document（文档）</td>
+<td>Row（行）</td>
+</tr>
+<tr>
+<td>Mapping</td>
+<td>Schema</td>
+</tr>
+<tr>
+<td>Fields（字段）</td>
+<td>Column（列）</td>
+</tr>
+</tbody>
+</table><ol class="simple">
+<li><p>index（索引）: 一个索引就是一个拥有几分相似特征的文档的集合</p></li>
+<li><p>type（类型）: 一个类型是索引的一个逻辑上的分类/分区,个索引中可以定义一种或多种类型</p></li>
+<li><p>document（文档）: 文档是一个可被索引的基础信息单元，也就是一条数据。相当于MySQL中的一条记录</p></li>
+<li><p>field（字段）: 对文档数据根据不同属性进行的分类标识</p></li>
+<li><p>mapping（映射）: mapping是处理数据的方式和规则方面做一些限制，如某个字段的数据类型、默认值、分析器、是否被索引等</p></li>
+<li><p>cluster（集群）: 一个集群就是由一个或多个节点组织在一起，它们共同持有整个的数据，并一起提供索引和搜索功能。</p></li>
+<li><p>node（节点）: 一个节点是集群中的一个服务器，作为集群的一部分，它存储数据，参与集群的索引和搜索功能。</p></li>
+<li><p>shard（分片）: 提供了将索引划分成多份的能力，这些份就叫做分片，允许你在分片之上进行分布式的、并行的操作，进而<em>提高性能/吞吐量</em></p></li>
+<li><p>replicas（副本）： 创建分片的一份或多份备份，这些备份叫做复制分片，或者直接叫副本。在分片/节点失败的情况下，提供了<em>高可用性</em></p></li>
+<li><p>allocation（分配）： 将分片分配给某个节点的过程，包括分配主分片或者副本。如果是副本，还包含从主分片复制数据的过程。这个过程是由master节点完成的。</p></li>
+</ol>
+</section>
+<section id="id6">
+<h3><span class="section-number">1.1.6. </span>索引相关操作<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+</section>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
-        <a href="chapter1.html" class="btn btn-neutral float-left" title="1. Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
-    </div>
+          <footer>
 
   <hr/>
 

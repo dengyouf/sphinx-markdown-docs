@@ -4,6 +4,15 @@
 
 ## elasticsearch
 
+elasticsearch 是一个高度可扩展的开源全文搜索和分析引擎，它可实现数据的实时全文搜索、支持分布式可实现高可用、提供 API 接口，可以处理大规模日志数据，比如 Nginx、Tomcat、系统日志等功能。Elasticsearch 使用 Java 语言开发，是建立在全文搜索引擎 Apache Lucene 基础之上的搜索引擎。
+
+Elasticsearch 的特点
+- 实时搜索、实时分析
+- 分布式架构、实时文件存储
+- 文档导向，所有对象都是文档
+- 高可用，易扩展，支持集群，分片与复制
+- 接口友好，支持 json
+
 ### 单点安装
 
 **rpm 安装**
@@ -283,3 +292,94 @@ pkill -9 java
 rm -rf /data/apps/elasticsearch/{data/*,logs/*}
 cluster.initial_master_nodes: ["elk2.linux.io"]
 ```
+
+### Cerebro 管理程序
+
+> 官网： https://github.com/lmenezes/cerebro
+
+Cerebro 是一个开源的elsticsearch web 管理工具 ，需要 java1.8 或者更高版本。
+
+- 下载
+
+```
+wget https://github.com/lmenezes/cerebro/releases/download/v0.8.1/cerebro-0.8.1.tgz
+```
+
+- 安装
+
+```
+ tar -xf cerebro-0.8.1.tgz -C /data/apps
+```
+
+- 配置
+
+```
+ cd /data/apps/cerebro-0.8.1/
+vim conf/application.conf 
+'''
+auth = {
+  type: basic
+    settings: {
+      username = "admin"
+      password = "1234"
+    }
+}
+...
+hosts = [
+  {
+    host = "http://192.168.122.135:9200"
+    name = "dev-es7-cluster"
+  #  headers-whitelist = [ "x-proxy-user", "x-proxy-roles", "X-Forwarded-For" ]
+  }
+  # Example of host with authentication
+  #{
+  #  host = "http://some-authenticated-host:9200"
+  #  name = "Secured Cluster"
+  #  auth = {
+  #    username = "username"
+  #    password = "secret-password"
+  #  }
+  #}
+]
+```
+
+- 启动服务
+
+```
+nohup ./bin/cerebro &
+```
+
+- 访问web
+
+默认的访问地址为：http://IP:9000
+
+![cerebro.png](./images/cerebro.png)
+
+
+### Elasticsearch相关术语
+
+![elastic.png](./images/elastic.png)
+
+**MySQL跟ElasticSearch对比**
+
+| Elasticsearch	 | MySQL |
+| --- | --- |
+| Index（索引）| 	Datobase（数据库）| 
+| Type（类型）	| Table（数据表）| 
+| Document（文档）| 	Row（行）| 
+| Mapping | 	Schema| 
+| Fields（字段）	| Column（列）| 
+
+1. index（索引）: 一个索引就是一个拥有几分相似特征的文档的集合
+2. type（类型）: 一个类型是索引的一个逻辑上的分类/分区,个索引中可以定义一种或多种类型
+3. document（文档）: 文档是一个可被索引的基础信息单元，也就是一条数据。相当于MySQL中的一条记录
+4. field（字段）: 对文档数据根据不同属性进行的分类标识
+5. mapping（映射）: mapping是处理数据的方式和规则方面做一些限制，如某个字段的数据类型、默认值、分析器、是否被索引等
+6. cluster（集群）: 一个集群就是由一个或多个节点组织在一起，它们共同持有整个的数据，并一起提供索引和搜索功能。
+7. node（节点）: 一个节点是集群中的一个服务器，作为集群的一部分，它存储数据，参与集群的索引和搜索功能。
+8.  shard（分片）: 提供了将索引划分成多份的能力，这些份就叫做分片，允许你在分片之上进行分布式的、并行的操作，进而*提高性能/吞吐量*
+9. replicas（副本）： 创建分片的一份或多份备份，这些备份叫做复制分片，或者直接叫副本。在分片/节点失败的情况下，提供了*高可用性*
+10. allocation（分配）： 将分片分配给某个节点的过程，包括分配主分片或者副本。如果是副本，还包含从主分片复制数据的过程。这个过程是由master节点完成的。
+
+### 索引相关操作
+
