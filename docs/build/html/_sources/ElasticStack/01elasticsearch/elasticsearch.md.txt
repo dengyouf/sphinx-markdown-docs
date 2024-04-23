@@ -1,0 +1,3 @@
+# Elasticsearch 安装
+
+## 单点安装

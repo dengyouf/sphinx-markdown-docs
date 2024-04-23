@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2. 日志采集 &mdash; SRE运维 v0.0.1 文档</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=7cf98a4c"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=beaddf03"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="prev" title="1. Getting started" href="chapter1.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SRE运维
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <p class="caption" role="heading"><span class="caption-text">运维文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chapter1.html">1. Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. 日志采集</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#elasticsearch">2.1. elasticsearch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">2.1.1. 单点安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">2.1.2. 集群安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">2.1.3. 启动失败解决方案</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SRE运维</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">2. </span>日志采集</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/elasticstack.md.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1><span class="section-number">2. </span>日志采集<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<!-- > <https://github.com/tchapi/markdown-cheatsheet> --><hr class="docutils" />
+<section id="elasticsearch">
+<h2><span class="section-number">2.1. </span>elasticsearch<a class="headerlink" href="#elasticsearch" title="Link to this heading"></a></h2>
+<section id="id2">
+<h3><span class="section-number">2.1.1. </span>单点安装<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p><strong>rpm 安装</strong></p>
+<ul class="simple">
+<li><p>下载软件包</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">elasticstack</span><span class="o">/</span><span class="mf">7.</span><span class="n">x</span><span class="o">/</span><span class="n">yum</span><span class="o">/</span><span class="mf">7.17.5</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">rpm</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>安装</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">localinstall</span> <span class="o">-</span><span class="n">y</span> <span class="o">./</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">rpm</span> 
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>准备日志目录和数据目录</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">install</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">es7</span><span class="o">/</span><span class="p">{</span><span class="n">data</span><span class="p">,</span><span class="n">logs</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="n">elasticsearch</span> <span class="o">-</span><span class="n">g</span> <span class="n">elasticsearch</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>配置</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">.</span><span class="n">yml</span>
+<span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">elk1</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="n">path</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">es7</span><span class="o">/</span><span class="n">data</span>
+<span class="n">path</span><span class="o">.</span><span class="n">logs</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">es7</span><span class="o">/</span><span class="n">logs</span>
+<span class="n">network</span><span class="o">.</span><span class="n">host</span><span class="p">:</span> <span class="mf">192.168.122.135</span>
+<span class="n">discovery</span><span class="o">.</span><span class="n">seed_hosts</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elk1.linux.io&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>启动服务</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemctl</span>  <span class="n">enable</span> <span class="n">elasticsearch</span> <span class="o">--</span><span class="n">now</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>验证</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="n">elk1</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span><span class="p">:</span><span class="mi">9200</span>
+<span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;elk1.linux.io&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;cluster_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;elasticsearch&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;cluster_uuid&quot;</span> <span class="p">:</span> <span class="s2">&quot;lO8uc1IrQAyBKR5579r8OA&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;number&quot;</span> <span class="p">:</span> <span class="s2">&quot;7.17.5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_flavor&quot;</span> <span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rpm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_hash&quot;</span> <span class="p">:</span> <span class="s2">&quot;8d61b4f7ddf931f219e3745f295ed2bbc50c8e84&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_date&quot;</span> <span class="p">:</span> <span class="s2">&quot;2022-06-23T21:57:28.736740635Z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_snapshot&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+    <span class="s2">&quot;lucene_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;8.11.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;minimum_wire_compatibility_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;6.8.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;minimum_index_compatibility_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;6.0.0-beta1&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;tagline&quot;</span> <span class="p">:</span> <span class="s2">&quot;You Know, for Search&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>预编译二进制安装</strong></p>
+<ul class="simple">
+<li><p>下载软件包</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">artifacts</span><span class="o">.</span><span class="n">elastic</span><span class="o">.</span><span class="n">co</span><span class="o">/</span><span class="n">downloads</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>解压</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tar</span> <span class="o">-</span><span class="n">xf</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>  <span class="o">-</span><span class="n">C</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span> 
+<span class="n">ln</span> <span class="o">-</span><span class="n">sv</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span> <span class="n">elasticsearch</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>准备日志目录和数据目录</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">useradd</span>   <span class="n">elastic</span>
+<span class="n">install</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="p">{</span><span class="n">data</span><span class="p">,</span><span class="n">logs</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="n">elastic</span> <span class="o">-</span><span class="n">g</span> <span class="n">elastic</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>配置</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">.</span><span class="n">yml</span> 
+<span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">elk2</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="n">path</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">data</span>
+<span class="n">path</span><span class="o">.</span><span class="n">logs</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">logs</span>
+<span class="n">network</span><span class="o">.</span><span class="n">host</span><span class="p">:</span> <span class="mf">192.168.122.136</span>
+<span class="n">discovery</span><span class="o">.</span><span class="n">seed_hosts</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elk2.linux.io&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>启动服务</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chown</span> <span class="o">-</span><span class="n">R</span> <span class="n">elastic</span><span class="o">.</span><span class="n">elastic</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span> 
+<span class="n">chown</span> <span class="o">-</span><span class="n">R</span> <span class="n">elastic</span><span class="o">.</span><span class="n">elastic</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span>
+<span class="n">su</span> <span class="o">-</span> <span class="n">elastic</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;/data/apps/elasticsearch-7.17.5/bin/elasticsearch -d&#39;</span>  
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>验证</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="n">elk2</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span><span class="p">:</span><span class="mi">9200</span>
+<span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;elk2.linux.io&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;cluster_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;elasticsearch&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;cluster_uuid&quot;</span> <span class="p">:</span> <span class="s2">&quot;Dw5L0Fb5Ska6RomQhspT2Q&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;number&quot;</span> <span class="p">:</span> <span class="s2">&quot;7.17.5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_flavor&quot;</span> <span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;tar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_hash&quot;</span> <span class="p">:</span> <span class="s2">&quot;8d61b4f7ddf931f219e3745f295ed2bbc50c8e84&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_date&quot;</span> <span class="p">:</span> <span class="s2">&quot;2022-06-23T21:57:28.736740635Z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_snapshot&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+    <span class="s2">&quot;lucene_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;8.11.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;minimum_wire_compatibility_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;6.8.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;minimum_index_compatibility_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;6.0.0-beta1&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;tagline&quot;</span> <span class="p">:</span> <span class="s2">&quot;You Know, for Search&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3><span class="section-number">2.1.2. </span>集群安装<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>主机名</th>
+<th>IP 地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>elk1.linux.io</td>
+<td>192.168.122.135</td>
+</tr>
+<tr>
+<td>elk2.linux.io</td>
+<td>192.168.122.136</td>
+</tr>
+<tr>
+<td>elk3.linux.io</td>
+<td>192.168.122.137</td>
+</tr>
+</tbody>
+</table><ul class="simple">
+<li><p>主机名解析</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hosts</span> <span class="o">&lt;&lt;</span><span class="s1">&#39;EOF&#39;</span>
+<span class="mf">192.168.122.135</span> <span class="n">elk1</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="mf">192.168.122.136</span> <span class="n">elk2</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="mf">192.168.122.137</span> <span class="n">elk3</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="n">EOF</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>所有节点针对ES基础调优</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">security</span><span class="o">/</span><span class="n">limits</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">es7</span><span class="o">.</span><span class="n">conf</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span>
+<span class="o">*</span>       <span class="n">soft</span>    <span class="n">nofile</span>  <span class="mi">65535</span>
+<span class="o">*</span>       <span class="n">hard</span>    <span class="n">nofile</span>  <span class="mi">131070</span>
+<span class="o">*</span>       <span class="n">hard</span>    <span class="n">nproc</span>   <span class="mi">8192</span>
+<span class="n">EOF</span>
+
+<span class="n">echo</span>  <span class="s2">&quot;vm.max_map_count=524288&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysctl</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">es</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>所有节点解压安装包</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tar</span> <span class="o">-</span><span class="n">xf</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>  <span class="o">-</span><span class="n">C</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>所有节点创建运行ES服务的用户和数据目录</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">useradd</span>  <span class="n">elastic</span>
+<span class="n">install</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="p">{</span><span class="n">data</span><span class="p">,</span><span class="n">logs</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="n">elastic</span> <span class="o">-</span><span class="n">g</span> <span class="n">elastic</span>
+<span class="n">chown</span> <span class="o">-</span><span class="n">R</span> <span class="n">elastic</span><span class="o">.</span><span class="n">elastic</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>配置</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">.</span><span class="n">yml</span> 
+<span class="n">cluster</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">dev</span><span class="o">-</span><span class="n">es7</span><span class="o">-</span><span class="n">cluster</span> <span class="c1"># 所有节点保持一致</span>
+<span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">elk1</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span> <span class="c1"># 修改为各自的主机名</span>
+<span class="n">path</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="n">data</span>
+<span class="n">path</span><span class="o">.</span><span class="n">logs</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="n">logs</span>
+<span class="n">network</span><span class="o">.</span><span class="n">host</span><span class="p">:</span> <span class="mf">0.0.0.0</span> <span class="c1"># 如果有多块网卡，请明确指定IP</span>
+<span class="n">discovery</span><span class="o">.</span><span class="n">seed_hosts</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elk1.linux.io&quot;</span><span class="p">,</span> <span class="s2">&quot;elk2.linux.io&quot;</span><span class="p">,</span> <span class="s2">&quot;elk3.linux.io&quot;</span><span class="p">]</span>
+<span class="n">cluster</span><span class="o">.</span><span class="n">initial_master_nodes</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elk1.linux.io&quot;</span><span class="p">,</span> <span class="s2">&quot;elk2.linux.io&quot;</span><span class="p">,</span> <span class="s2">&quot;elk3.linux.io&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>使用Unit风格管理服务</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">es7</span><span class="o">.</span><span class="n">service</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span>
+<span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
+<span class="n">Description</span><span class="o">=</span><span class="n">dev</span> <span class="n">service</span> <span class="n">es7</span>
+<span class="n">After</span><span class="o">=</span><span class="n">network</span><span class="o">.</span><span class="n">target</span>
+
+<span class="p">[</span><span class="n">Service</span><span class="p">]</span>
+<span class="n">Type</span><span class="o">=</span><span class="n">simple</span>
+<span class="n">Environment</span><span class="o">=</span><span class="n">ES_HOME</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="n">jdk</span><span class="o">/</span>
+<span class="n">Environment</span><span class="o">=</span><span class="n">ES_PATH_CONF</span><span class="o">=</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="n">config</span>
+<span class="n">ExecStart</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="mf">7.17.5</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">elasticsearch</span>
+<span class="n">User</span><span class="o">=</span><span class="n">elastic</span>
+<span class="n">Group</span><span class="o">=</span><span class="n">elastic</span>
+<span class="n">LimitNOFILE</span><span class="o">=</span><span class="mi">131070</span>
+<span class="n">LimitNPROC</span><span class="o">=</span><span class="mi">4096</span>
+
+<span class="p">[</span><span class="n">Install</span><span class="p">]</span>
+<span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
+<span class="n">EOF</span>
+<span class="n">systemctl</span>  <span class="n">daemon</span><span class="o">-</span><span class="n">reload</span>
+<span class="n">systemctl</span>  <span class="n">enable</span> <span class="n">es7</span> <span class="o">--</span><span class="n">now</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>验证</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="n">elk2</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span><span class="p">:</span><span class="mi">9200</span>
+<span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;elk2.linux.io&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;cluster_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;dev-es7-cluster&quot;</span><span class="p">,</span>  <span class="c1"># </span>
+  <span class="s2">&quot;cluster_uuid&quot;</span> <span class="p">:</span> <span class="s2">&quot;0Efxhjq_S5uddZfIPLXLqQ&quot;</span><span class="p">,</span> <span class="c1"># 确保所有节点都一致</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;number&quot;</span> <span class="p">:</span> <span class="s2">&quot;7.17.5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_flavor&quot;</span> <span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;tar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_hash&quot;</span> <span class="p">:</span> <span class="s2">&quot;8d61b4f7ddf931f219e3745f295ed2bbc50c8e84&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_date&quot;</span> <span class="p">:</span> <span class="s2">&quot;2022-06-23T21:57:28.736740635Z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;build_snapshot&quot;</span> <span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+    <span class="s2">&quot;lucene_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;8.11.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;minimum_wire_compatibility_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;6.8.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;minimum_index_compatibility_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;6.0.0-beta1&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;tagline&quot;</span> <span class="p">:</span> <span class="s2">&quot;You Know, for Search&quot;</span>
+<span class="p">}</span>
+<span class="n">curl</span> <span class="n">elk2</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span><span class="p">:</span><span class="mi">9200</span><span class="o">/</span><span class="n">_cat</span><span class="o">/</span><span class="n">nodes</span>
+<span class="mf">192.168.122.137</span> <span class="mi">42</span> <span class="mi">96</span>  <span class="mi">0</span> <span class="mf">0.02</span> <span class="mf">0.07</span> <span class="mf">0.15</span> <span class="n">cdfhilmrstw</span> <span class="o">*</span> <span class="n">elk3</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="mf">192.168.122.136</span> <span class="mi">20</span> <span class="mi">91</span>  <span class="mi">8</span> <span class="mf">0.21</span> <span class="mf">0.24</span> <span class="mf">0.33</span> <span class="n">cdfhilmrstw</span> <span class="o">-</span> <span class="n">elk2</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+<span class="mf">192.168.122.135</span>  <span class="mi">7</span> <span class="mi">97</span> <span class="mi">10</span> <span class="mf">0.21</span> <span class="mf">0.39</span> <span class="mf">0.74</span> <span class="n">cdfhilmrstw</span> <span class="o">-</span> <span class="n">elk1</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">io</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3><span class="section-number">2.1.3. </span>启动失败解决方案<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>报错：<code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">file</span> <span class="pre">descriptors</span> <span class="pre">[4096]</span> <span class="pre">for</span> <span class="pre">elasticsearch</span> <span class="pre">process</span> <span class="pre">is</span> <span class="pre">too</span> <span class="pre">low,</span> <span class="pre">increase</span> <span class="pre">to</span> <span class="pre">at</span> <span class="pre">least</span> <span class="pre">[65535]</span></code></p></li>
+<li><p>解决方案：修改文件打开数量上线，修改后需要断开会话</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">security</span><span class="o">/</span><span class="n">limits</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">es7</span><span class="o">.</span><span class="n">conf</span>
+<span class="o">*</span>	<span class="n">soft</span>	<span class="n">nofile</span>	<span class="mi">65535</span>
+<span class="o">*</span>	<span class="n">hard</span>	<span class="n">nofile</span>	<span class="mi">131070</span>
+<span class="o">*</span>	<span class="n">hard</span>	<span class="n">nproc</span>	<span class="mi">8192</span>
+
+<span class="n">ulimit</span> <span class="o">-</span><span class="n">Sn</span>
+<span class="mi">65535</span>
+<span class="n">ulimit</span> <span class="o">-</span><span class="n">Hn</span>
+<span class="mi">131070</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>报错： <code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">virtual</span> <span class="pre">memory</span> <span class="pre">areas</span> <span class="pre">vm.max_map_count</span> <span class="pre">[65530]</span> <span class="pre">is</span> <span class="pre">too</span> <span class="pre">low,</span> <span class="pre">increase</span> <span class="pre">to</span> <span class="pre">at</span> <span class="pre">least</span> <span class="pre">[262144]</span></code></p></li>
+<li><p>解决方案： 调大内核虚拟内存映射值</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysctl</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">es</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">max_map_count</span><span class="o">=</span><span class="mi">524288</span>
+
+<span class="n">sysctl</span> <span class="o">-</span><span class="n">f</span>  <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysctl</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">es</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">sysctl</span> <span class="o">-</span><span class="n">q</span> <span class="n">vm</span><span class="o">.</span><span class="n">max_map_count</span>      
+<span class="n">vm</span><span class="o">.</span><span class="n">max_map_count</span> <span class="o">=</span> <span class="mi">524288</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>报错：<code class="docutils literal notranslate"><span class="pre">java.net.UnknownHostException:</span> <span class="pre">elk2.linux.io</span></code></p></li>
+<li><p>解决办法：hosts文件主机名添加解析</p></li>
+<li><p>报错：<code class="docutils literal notranslate"><span class="pre">&quot;cluster_uuid&quot;</span> <span class="pre">:</span> <span class="pre">&quot;_na_&quot;,</span></code></p></li>
+<li><p>解决办法：停止进程，然后删除脏数据，添加配置 cluster.initial_master_nodes，重新启动服务</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 删除脏数据，可不操作，仅适用于新集群</span>
+<span class="n">pkill</span> <span class="o">-</span><span class="mi">9</span> <span class="n">java</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="p">{</span><span class="n">data</span><span class="o">/*</span><span class="p">,</span><span class="n">logs</span><span class="o">/*</span><span class="p">}</span>
+<span class="n">cluster</span><span class="o">.</span><span class="n">initial_master_nodes</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elk2.linux.io&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="chapter1.html" class="btn btn-neutral float-left" title="1. Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2024, Deng You。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

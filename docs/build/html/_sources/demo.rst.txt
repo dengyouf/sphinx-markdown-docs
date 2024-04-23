@@ -1,0 +1,19 @@
+Elasticsearch 安装
+===============
+That has a paragraph about a main subject and is set when the '='
+is at least the same length of the title itself.
+
+单点安装
+----------------
+#. rpm包
+#. 预编译二进制包
+
+
+ #. Item 1
+ #. Item 2
+
+集群安装
+-------------
+Words can have *emphasis in italics* or be **bold** and you can define
+code samples with back quotes, like when you talk about a command: ``sudo``
+gives you super user powers!
