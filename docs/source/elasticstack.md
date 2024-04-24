@@ -381,5 +381,399 @@ nohup ./bin/cerebro &
 9. replicas（副本）： 创建分片的一份或多份备份，这些备份叫做复制分片，或者直接叫副本。在分片/节点失败的情况下，提供了*高可用性*
 10. allocation（分配）： 将分片分配给某个节点的过程，包括分配主分片或者副本。如果是副本，还包含从主分片复制数据的过程。这个过程是由master节点完成的。
 
+**集群状态**
+
+![](./images/escluster.png)
+
+- green: 表示所有的主分片和副本分片均正常工作
+- yellow： 表示部分副本分片不正常
+- red： 表示有部分主分片不正常工作
+
 ### 索引相关操作
 
+> [官网](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html): https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html
+
+**创建索引**
+
+- 创建默认索引(不指定分片和副本，默认为一个分片一个副本)
+```
+curl -X PUT http://elk1.linux.io:9200/dev-index-00 
+```
+> 索引名称建议不要出现以`.`、`_`、—`开头，索引名册不能出现大写。必须小写
+
+- 创建指定(5个)分片和（2个副本）副本的索引
+```
+curl -X PUT 'http://elk1.linux.io:9200/dev-index-04' -H 'Content-Type: application/json' -d '{
+    "settings": {
+        "index": {
+            "number_of_shards": 5,
+            "number_of_replicas": 3 
+        }
+    }
+}'
+{"acknowledged":true,"shards_acknowledged":true,"index":"dev-index-03"}
+```
+> 副本数不应该小于集群节点数，否则集群会处于yellow状态
+
+**修改索引**
+```
+curl -X PUT 'http://elk1.linux.io:9200/dev-index-04/_settings'  -H 'Content-Type: application/json' -d  '{
+    "settings": {
+        "index": {
+            "number_of_replicas": 2 
+        }
+    }
+}'
+```
+> 可修改索引的副本数，但是不能动态修改分片数。
+
+**查看索引**
+
+- 查看所有索引
+```
+curl -X GET http://elk1.linux.io:9200/_cat/indices?v
+health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .geoip_databases ANg7J6ZfTPq6qyZ9K7MmoA   1   1         35            0       65mb         32.5mb
+green  open   dev-index-01     cvRDzENCRtuaGievH2wo9g   1   1          0            0       452b           226b
+green  open   dev-index-00     drO789YOT_GoKHV_sLwEyw   1   1          0            0       452b           226b
+```
+
+- 查看单个索引
+```
+
+```
+
+**删除索引**
+
+- 删除单个索引
+```
+curl -X DELETE http://elk1.linux.io:9200/dev-index-03
+```
+
+- 基于通配符删除多个索引
+```
+curl -X DELETE http://elk1.linux.io:9200/dev-index-*
+```
+
+**索引别名**
+
+- 添加索引别名
+```
+curl -X  POST http://elk1.linux.io:9200/_aliases -H 'Content-Type: application/json' -d  '{
+    "actions": [
+        {
+            "add": {
+                "index": "dev-index-00",
+                "alias": "dev00"
+            }
+        },
+         {
+            "add": {
+                "index": "dev-index-01",
+                "alias": "dev02"
+            }
+        }
+    ]
+}'
+```
+
+- 查看索引别名
+```
+curl -X GET http://elk1.linux.io:9200/_cat/aliases?v
+```
+
+- 删除索引别名
+```
+curl -X  POST http://elk1.linux.io:9200/_aliases -H 'Content-Type: application/json' -d  '{
+    "actions": [
+        {
+            "remove": {
+                "index": "dev-index-00",
+                "alias": "dev00"
+            }
+        }
+    ]
+}'
+```
+
+- 修改索引别名
+```
+curl -X POST http://elk1.linux.io:9200/_aliases -H 'Content-Type: application/json' -d  '
+{
+    "actions": [
+        {
+            "remove": {
+                "index": "dev-index-01",
+                "alias": "dev02"
+            }
+        },
+         {
+            "add": {
+                "index": "dev-index-01",
+                "alias": "dev01"
+            }
+        }
+    ]
+}
+'
+```
+
+**关闭索引**
+
+```
+curl -X POST http://elk1.linux.io:9200/dev-index-01/_close
+curl -X GET http://elk1.linux.io:9200/_cat/indices?v
+```
+
+**打开索引**
+
+```
+curl -X POST http://elk1.linux.io:9200/dev-index-01/_open
+```
+
+
+### 文档基础操作
+
+elasticsearch是面向文档的搜索，文档是ES所有可搜索数据的最小单元。在ES中文档会被序列化成json格式进行保存，每个文档都会有一个Unique ID，这个ID可以有用户在创建文档的时候指定，在用户未指定时则由ES自己生成。
+
+在ES中一个文档所包含的元数据如下：
+
+_index：文档所属索引名称
+_type：文档所属类型名
+_id：文档唯一ID
+_version：文档的版本信息
+_seq_no：Shard级别严格递增的顺序号，保证后写入文档的_seq_no大于先写入文档的_seq_no
+_primary_term：主分片发生重分配时递增1，主要用来恢复数据时处理当多个文档的_seq_no一样时的冲突
+_score：相关性评分，在进行文档搜索时，根据该结果与搜索关键词的相关性进行评分
+_source：文档的原始JSON数据
+
+elasticsearch 中一个文档的栗子如下：
+
+```
+{
+  "_index": "students",
+  "_type": "_doc",
+  "_id": "Vy8oDo8Brjjn75MKeoUE",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "_seq_no": 0,
+  "_primary_term": 1
+}
+```
+
+**创建文档**
+
+```
+curl -X PUT http://elk1.linux.io:9200/students
+```
+
+- 不指定文档ID进行创建
+
+```
+curl -X POST http://elk1.linux.io:9200/students/_doc  -H 'Content-Type: application/json' -d  '
+{
+    "name": "张三",
+    "age": 20,
+    "hobby": ["读书", "写字"]
+}
+'
+# output
+{
+  "_index": "students",
+  "_type": "_doc",
+  "_id": "Vy8oDo8Brjjn75MKeoUE",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "_seq_no": 0,
+  "_primary_term": 1
+}
+```
+
+- 指定文档ID进行创建
+
+```
+curl -X POST http://elk1.linux.io:9200/students/_doc/10001  -H 'Content-Type: application/json' -d  '
+{
+    "name": "Jerry",
+    "age": 20,
+    "hobby": ["read", "write", "game"]
+}
+'|jq
+
+# output
+{
+  "_index": "students",
+  "_type": "_doc",
+  "_id": "10001",  # 文档ID
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "_seq_no": 1,
+  "_primary_term": 2
+}
+```
+
+**文档修改**
+
+- 全量修改 
+```
+curl -X POST http://elk1.linux.io:9200/students/_doc/10001  -H 'Content-Type: application/json' -d  '
+{
+    "age": 31 
+}
+'
+```
+
+- 只修改或者某个字段
+```
+curl -X POST http://elk1.linux.io:9200/students/_doc/10001/_update -H 'Content-Type: application/json' -d '
+{
+    "doc":{
+        "age":20,
+        "hobby":["读书","写字","打球"]
+    }
+}
+'
+```
+
+**文档查看**
+
+```
+curl -X GET http://elk1.linux.io:9200/students/_search|jq 
+
+# output
+{
+  "took": 5,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 2, # 2个文档
+      "relation": "eq"
+    },
+    "max_score": 1,
+    "hits": [
+      {
+        "_index": "students",
+        "_type": "_doc",
+        "_id": "Vy8oDo8Brjjn75MKeoUE", 
+        "_score": 1,
+        "_source": {
+          "name": "张三",
+          "age": 20,
+          "hobby": [
+            "读书",
+            "写字"
+          ]
+        }
+      },
+      {
+        "_index": "students",
+        "_type": "_doc",
+        "_id": "10001",
+        "_score": 1,
+        "_source": {
+          "age": 20,
+          "hobby": [
+            "读书",
+            "写字",
+            "打球"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
+**删除文档**
+
+- 根据文档id进行删除
+```
+curl -X DELETE http://elk1.linux.io:9200/students/_doc/10001
+# output
+{
+  "_index": "students",
+  "_type": "_doc",
+  "_id": "10001",
+  "_version": 4,
+  "result": "deleted",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "_seq_no": 4,
+  "_primary_term": 2
+}
+```
+
+### 文档批量操作
+
+- 批量创建
+```
+curl -X  POST http://elk1.linux.io:9200/_bulk -H 'Content-Type: application/json' -d  '
+{ "create": { "_index": "students"} }
+{ "name": "小阿","hobby":["python","golang"] }
+{ "create": { "_index": "students","_id": 1001} }
+{ "name": "小波","hobby":["java","nodejs"] }
+{ "create": { "_index": "students","_id": 1002} }
+{ "name": "小蔡","hobby":["篮球"] }
+{ "create": { "_index": "students"} }
+{ "name": "大D","hobby":["旅游","喝酒"] } 
+'
+```
+
+- 批量修改
+```
+curl -X  POST http://elk1.linux.io:9200/_bulk -H 'Content-Type: application/json' -d  '
+{ "update" : {"_id" : "1001", "_index" : "students"} }
+{ "doc" : {"name" : "波波"} }
+{ "update" : {"_id" : "1002", "_index" : "students"} }
+{ "doc" : {"name" : "蔡老板"} }
+'
+```
+
+- 批量查询
+```
+curl -X  POST http://elk1.linux.io:9200/_mget -H 'Content-Type: application/json' -d  '
+{
+  "docs": [
+    {
+      "_index": "students",
+      "_id": "1001"
+    },
+    {
+      "_index": "students",
+      "_id": "1002"
+    }
+  ]
+} 
+'
+```
+- 批量删除
+```
+curl -X  POST http://elk1.linux.io:9200/_bulk -H 'Content-Type: application/json' -d  '
+{ "delete": { "_index": "students", "_id": "1001"} }
+{ "delete": { "_index": "students", "_id": "1002"} }
+'
+```
