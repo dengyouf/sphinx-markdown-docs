@@ -1,8 +1,6 @@
-# 日志采集
+# Elasticsearch
 <!-- > <https://github.com/tchapi/markdown-cheatsheet> -->
 - - - -
-
-## elasticsearch
 
 elasticsearch 是一个高度可扩展的开源全文搜索和分析引擎，它可实现数据的实时全文搜索、支持分布式可实现高可用、提供 API 接口，可以处理大规模日志数据，比如 Nginx、Tomcat、系统日志等功能。Elasticsearch 使用 Java 语言开发，是建立在全文搜索引擎 Apache Lucene 基础之上的搜索引擎。
 
@@ -13,6 +11,7 @@ Elasticsearch 的特点
 - 高可用，易扩展，支持集群，分片与复制
 - 接口友好，支持 json
 
+## 安装
 ### 单点安装
 
 **rpm 安装**
@@ -353,12 +352,14 @@ nohup ./bin/cerebro &
 
 默认的访问地址为：http://IP:9000
 
-![cerebro.png](https://github.com/dengyouf/sphinx-markdown-docs/blob/sources/docs/source/images/cerebro.png?raw=true)
+![cerebro.png](../../images/cerebro.png)
 
+
+## 基础
 
 ### Elasticsearch相关术语
 
-![elastic.png](https://github.com/dengyouf/sphinx-markdown-docs/blob/sources/docs/source/images/elastic.png?raw=true)
+![elastic.png](../../images/elastic.png)
 
 **MySQL跟ElasticSearch对比**
 
@@ -393,17 +394,17 @@ nohup ./bin/cerebro &
 
 > [官网](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html): https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html
 
-**创建索引**
+#### 创建索引
 
 - 创建默认索引(不指定分片和副本，默认为一个分片一个副本)
 ```
-curl -X PUT http://elk1.linux.io:9200/dev-index-00 
+curl -X PUT http://elk1.linux.io:9200/dev-index-00?pretty
 ```
 > 索引名称建议不要出现以`.`、`_`、—`开头，索引名册不能出现大写。必须小写
 
 - 创建指定(5个)分片和（2个副本）副本的索引
 ```
-curl -X PUT 'http://elk1.linux.io:9200/dev-index-04' -H 'Content-Type: application/json' -d '{
+curl -X PUT 'http://elk1.linux.io:9200/dev-index-04?pretty' -H 'Content-Type: application/json' -d '{
     "settings": {
         "index": {
             "number_of_shards": 5,
@@ -411,13 +412,18 @@ curl -X PUT 'http://elk1.linux.io:9200/dev-index-04' -H 'Content-Type: applicati
         }
     }
 }'
-{"acknowledged":true,"shards_acknowledged":true,"index":"dev-index-03"}
+# output
+{
+  "acknowledged" : true,
+  "shards_acknowledged" : true,
+  "index" : "dev-index-04"
+}
 ```
 > 副本数不应该小于集群节点数，否则集群会处于yellow状态
 
-**修改索引**
+#### 修改索引
 ```
-curl -X PUT 'http://elk1.linux.io:9200/dev-index-04/_settings'  -H 'Content-Type: application/json' -d  '{
+curl -X PUT 'http://elk1.linux.io:9200/dev-index-04/_settings?pretty'  -H 'Content-Type: application/json' -d  '{
     "settings": {
         "index": {
             "number_of_replicas": 2 
@@ -427,7 +433,7 @@ curl -X PUT 'http://elk1.linux.io:9200/dev-index-04/_settings'  -H 'Content-Type
 ```
 > 可修改索引的副本数，但是不能动态修改分片数。
 
-**查看索引**
+#### 查看索引
 
 - 查看所有索引
 ```
@@ -437,24 +443,28 @@ green  open   .geoip_databases ANg7J6ZfTPq6qyZ9K7MmoA   1   1         35        
 green  open   dev-index-01     cvRDzENCRtuaGievH2wo9g   1   1          0            0       452b           226b
 green  open   dev-index-00     drO789YOT_GoKHV_sLwEyw   1   1          0            0       452b           226b
 ```
+- 查看单个索引
+```
+curl -X GET    http://elk1.linux.io:9200/dev-index-01
+```
 
-**删除索引**
+#### 删除索引
 
 - 删除单个索引
 ```
-curl -X DELETE http://elk1.linux.io:9200/dev-index-03
+curl -X DELETE http://elk1.linux.io:9200/dev-index-03?pretty
 ```
 
 - 基于通配符删除多个索引
 ```
-curl -X DELETE http://elk1.linux.io:9200/dev-index-*
+curl -X DELETE http://elk1.linux.io:9200/dev-index-*?pretty
 ```
 
-**索引别名**
+#### 索引别名
 
 - 添加索引别名
 ```
-curl -X  POST http://elk1.linux.io:9200/_aliases -H 'Content-Type: application/json' -d  '{
+curl -X  POST http://elk1.linux.io:9200/_aliases?pretty -H 'Content-Type: application/json' -d  '{
     "actions": [
         {
             "add": {
@@ -513,20 +523,20 @@ curl -X POST http://elk1.linux.io:9200/_aliases -H 'Content-Type: application/js
 '
 ```
 
-**关闭索引**
+#### 关闭索引
 
 ```
 curl -X POST http://elk1.linux.io:9200/dev-index-01/_close
 curl -X GET http://elk1.linux.io:9200/_cat/indices?v
 ```
 
-**打开索引**
+#### 打开索引
 
 ```
 curl -X POST http://elk1.linux.io:9200/dev-index-01/_open
 ```
 
-**索引模板**
+#### 索引模板
 
 索引模板是创建索引得一种方式，用户可以根据需求自定义对应的索引模板。
 
@@ -617,17 +627,16 @@ elasticsearch 中一个文档的栗子如下：
   "_primary_term": 1
 }
 ```
-
-**创建文档**
+#### 创建文档
 
 ```
-curl -X PUT http://elk1.linux.io:9200/students
+curl -X PUT http://elk1.linux.io:9200/students?pretty
 ```
 
 - 不指定文档ID进行创建
 
 ```
-curl -X POST http://elk1.linux.io:9200/students/_doc  -H 'Content-Type: application/json' -d  '
+curl -X POST http://elk1.linux.io:9200/students/_doc?pretty  -H 'Content-Type: application/json' -d  '
 {
     "name": "张三",
     "age": 20,
@@ -654,13 +663,13 @@ curl -X POST http://elk1.linux.io:9200/students/_doc  -H 'Content-Type: applicat
 - 指定文档ID进行创建
 
 ```
-curl -X POST http://elk1.linux.io:9200/students/_doc/10001  -H 'Content-Type: application/json' -d  '
+curl -X POST http://elk1.linux.io:9200/students/_doc/10001?pretty  -H 'Content-Type: application/json' -d  '
 {
     "name": "Jerry",
     "age": 20,
     "hobby": ["read", "write", "game"]
 }
-'|jq
+'
 
 # output
 {
@@ -679,7 +688,7 @@ curl -X POST http://elk1.linux.io:9200/students/_doc/10001  -H 'Content-Type: ap
 }
 ```
 
-**文档修改**
+#### 文档修改
 
 - 全量修改 
 ```
@@ -702,10 +711,10 @@ curl -X POST http://elk1.linux.io:9200/students/_doc/10001/_update -H 'Content-T
 '
 ```
 
-**文档查看**
+#### 文档查看
 
 ```
-curl -X GET http://elk1.linux.io:9200/students/_search|jq 
+curl -X GET http://elk1.linux.io:9200/students/_search?pretty
 
 # output
 {
@@ -757,7 +766,7 @@ curl -X GET http://elk1.linux.io:9200/students/_search|jq
 }
 ```
 
-**删除文档**
+#### 删除文档
 
 - 根据文档id进行删除
 ```
@@ -779,7 +788,7 @@ curl -X DELETE http://elk1.linux.io:9200/students/_doc/10001
 }
 ```
 
-### 文档批量操作
+#### 批量操作
 
 - 批量创建
 ```
@@ -836,7 +845,7 @@ curl -X  POST http://elk1.linux.io:9200/_bulk -H 'Content-Type: application/json
 
 ElasticSearch 内置了分词器，如标准分词器、简单分词器、空白词器等。但这些分词器对我们最常使用的中文并不友好，不能按我们的语言习惯进行分词
 
-**standard 分词器**
+#### standard 分词器
 
 标准分词器模式使用空格和符号进行切割分词的。
 
@@ -1032,7 +1041,7 @@ curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/jso
 }
 ```
 
-**IK分词器**
+#### IK分词器
 
 ElasticSearch 内置了分词器，如标准分词器、简单分词器、空白词器等。但这些分词器对我们最常使用的中文并不友好，不能按我们的语言习惯进行分词。
 
@@ -1344,11 +1353,904 @@ curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/jso
 
 Elasticsearch 提供了基于JSON的完整 Query DSL（Domain Specific Language，领域特定语言）来定义查询。
 
-# TODO
+#### 准备数据
 
-## kibana
+- 创建索引添加映射关系
+```
+curl -X PUT  http://elk1.linux.io:9200/es-shopping-data -H "Content-Type: application/json" -d '
+{
+    "mappings": {
+        "properties": {
+            "item": {
+                "type": "text"
+            },
+            "title": {
+                "type": "text"
+            },
+            "price": {
+                "type": "double"
+            },
+            "type": {
+                "type": "keyword"
+            },
+            "group": {
+                "type": "long"
+            },
+            "auther": {
+                "type": "text"
+            },
+            "birthday": {
+                "type": "date",
+                "format": "yyyy-MM-dd"
+            },
+            "province": {
+                "type": "keyword"
+            },
+            "city": {
+                "type": "keyword"
+            },
+            "remote_ip": {
+                "type": "ip"
+            }
+        }
+    }
+}
+'
+```
 
-### 安装
+- 准备数据，数据格式如下所示：
+```
+cat data.json
+...
+{ "create": { "_index": "es-shopping-data"}}
+{"item":"https://item.jd.com/10045181911666.html","title":"华为（HUAWEI） 遥控器原装蓝牙NFC智慧屏语音控制鸿蒙电视S｜SE｜V系列可通用荣耀X1系列 黑色【盒装未拆封】支持NFC（HDRC-BV1）","price":159.00,"type":"electronic product","group":1,"auther":"张三","birthday":"1993-12-03","province":"云南","city":"曲靖","remote_ip":"211.144.24.221"}
+...
+```
+
+- 批量插入数据
+```
+ curl -X POST http://elk1.linux.io:9200/_bulk -H "Content-Type: application/json"  --data-binary  @data.json
+```
+
+#### 全文检索-match
+
+- 查询张山相关的所有数据,只要含有张或者山，或者张山的数据都会被匹配
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match":{
+            "auther":"张山"
+        }
+    }
+}
+'|jq
+```
+#### 精确匹配-match_phrase
+
+- 查询张山的数据，必须精确匹配张三
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match_phrase":{
+            "auther":"张山"
+        }
+    }
+}
+'|jq
+```
+#### 全量查询-match_all
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "match_all": {}
+    }
+}
+'|jq
+```
+
+#### 分页查询
+- 每页显示3条数据，查询第四页，如果一个数据总共有total条文档，那么我们想要就知道一共有`m=int（total/n）+1`页，如果想要查询最后一页数据则 `from=(m-1)*n`
+  - size： 单页返回的文档数，此处设置为n条
+  - from：跳过多少条文档数
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match_phrase":{
+            "auther":"张三"
+        }
+    },
+    "size": 3,
+    "from":9
+}
+'|jq
+```
+
+- 查询第六组数据，每页显示7条数据，查询第9页
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match":{
+            "group":6
+        }
+    },
+    "size":7,
+    "from": 56
+}
+'|jq
+```
+
+> 生产环境中，不建议深度分页，百度的页码数量控制在76页左右。
+
+#### 查看的指定字段-`_source`
+
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match_phrase":{
+            "auther":"张三"
+        }
+    },
+    "_source":["title","auther","price"]
+}
+'|jq
+```
+
+#### 查询存在某个字段的文档-exists
+
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "exists" : {
+            "field": "hobby"
+        }
+    }
+}
+'|jq
+```
+
+#### 语法高亮
+
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "match_phrase": {
+            "title": "孙子兵法"
+        }
+    },
+    "highlight": {
+        "pre_tags": [
+            "<span style='color:red;'>"
+        ],
+        "post_tags": [
+            "</span>"
+        ],
+        "fields": {
+            "title": {}
+        }
+    }
+}
+'|jq
+```
+
+#### 排序查询
+- 升序查询最便宜商品及价格
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match_phrase":{
+            "auther":"张三"
+        }
+    },
+    "sort":{
+        "price":{
+            "order": "asc"
+        }
+    },
+    "size":1
+}
+'|jq
+```
+- 降序查询最贵的商品及价格
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "match_phrase":{
+            "auther":"张山"
+        }
+    },
+    "sort":{
+        "price":{
+            "order": "desc"
+        }
+    },
+    "size":1
+}
+'|jq
+```
+#### 多条件查询-bool
+
+- 查看作者是张山且商品价格为24.90
+
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match_phrase": {
+                        "auther": "张山"
+                    }
+                },
+                {
+                    "match": {
+                        "price": 24.90
+                    }
+                }
+            ]
+        }
+    }
+}
+'|jq
+```
+- 查看作者是张山或者是李四的商品并降序排序
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "should": [
+                {
+                    "match_phrase": {
+                        "auther": "张山"
+                    }
+                },
+                {
+                    "match_phrase": {
+                        "auther": "李四"
+                    }
+                }
+            ]
+        }
+    },
+    "sort":{
+        "price":{
+            "order": "desc"
+        }
+    }
+}
+'|jq
+```
+- 查看作者是张山或者是李四且商品价格为168或者198
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "should": [
+                {
+                    "match_phrase": {
+                        "auther": "张山"
+                    }
+                },
+                {
+                    "match_phrase": {
+                        "auther": "李四"
+                    }
+                },
+                {
+                    "match": {
+                        "price": 168.00
+                    }
+                },
+                {
+                    "match": {
+                        "price": 198.00
+                    }
+                }
+            ],
+            "minimum_should_match": "60%"
+        }
+    }
+}
+'|jq
+```
+- 查看作者不是张山或者是李四且商品价格为168或者198的商品
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "must_not": [
+                {
+                    "match_phrase": {
+                        "auther": "张山"
+                    }
+                },
+                {
+                    "match_phrase": {
+                        "auther": "李四"
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "match": {
+                        "price": 168.00
+                    }
+                },
+                {
+                    "match": {
+                        "price": 198.00
+                    }
+                }
+            ],
+            "minimum_should_match": 1
+        }
+    }
+}
+'|jq
+```
+
+#### 过滤查询-filter
+- 查询3组成员产品价格3599到10500的商品的最便宜的3个
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "group": 3
+                    }
+                }
+            ],
+            "filter": {
+                "range": {
+                    "price": {
+                        "gte": 3599,
+                        "lte": 10500
+                    }
+                }
+            }
+        }
+    },
+    "sort": {
+        "price": {
+            "order": "asc"
+        }
+    },
+    "size": 3
+}
+'|jq
+```
+- 查询2,4,6这3个组的最贵的3个产品且不包含酒的商品
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query":{
+        "bool":{
+            "must_not":[
+                {
+                    "match":{
+                        "title": "酒"
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "match":{
+                        "group":2
+                    }
+                },
+                 {
+                    "match":{
+                        "group":4
+                    }
+                },
+                 {
+                    "match":{
+                        "group":6
+                    }
+                }
+            ]
+        }
+    },
+    "sort":{
+        "price":{
+            "order": "desc"
+        }
+    },
+    "size":3
+}
+'|jq
+```
+#### 精确匹配多个值-terms
+- 查询商品价格为9.9和19.8的商品
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "terms": {
+            "price": [
+                9.9,
+                19.9
+            ]
+        }
+    }
+}
+'|jq
+```
+#### 多词搜索
+
+- 多词搜索包含"小面包"关键字的所有商品
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "title": {
+                            "query": "小面包",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "highlight": {
+        "pre_tags": [
+            "<h1>"
+        ],
+        "post_tags": [
+            "</h1>"
+        ],
+        "fields": {
+            "title": {}
+        }
+    }
+}
+'|jq
+```
+#### 权重查询
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search?pretty  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "title": {
+                            "query": "小面包",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "match": {
+                        "title": {
+                            "query": "下午茶",
+                            "boost": 5
+                        }
+                    }
+                },
+                {
+                    "match": {
+                        "title": {
+                            "query": "良品铺子",
+                            "boost": 2
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "highlight": {
+        "pre_tags": [
+            "<h1>"
+        ],
+        "post_tags": [
+            "</h1>"
+        ],
+        "fields": {
+            "title": {}
+        }
+    }
+}
+'
+```
+#### 聚合查询-aggs
+- 统计每个组收集的商品数量
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search?pretty  -H "Content-Type: application/json"  -d '
+{
+    
+    "aggs": {
+        "item_group_count": {
+            "terms":{
+                "field": "group"
+            }
+        }
+    },
+    "size": 0
+}
+'
+```
+- 统计2组最贵的商品
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search?pretty  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "match": {
+            "group": 2
+        }
+    },
+    "aggs": {
+        "item_max_shopping": {
+            "max": {
+                "field": "price"
+            }
+        }
+    },
+    "sort":{
+        "price":{
+            "order":"desc"
+        }
+    },
+    "size": 1   
+}
+'
+```
+- 统计3组最便宜的商品
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search?pretty  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "match": {
+            "group": 3
+        }
+    },
+    "aggs": {
+        "item_min_shopping": {
+            "min": {
+                "field": "price"
+            }
+        }
+    },
+    "sort":{
+        "price":{
+            "order": "asc"
+        }
+    },
+    "size": 1
+}
+'
+```
+- 统计4组商品的平均价格
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search?pretty  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "match": {
+            "group": 4
+        }
+    },
+    "aggs": {
+        "item_avg_shopping": {
+            "avg": {
+                "field": "price"
+            }
+        }
+    },
+    "size": 0
+}
+'
+```
+- 统计买下5组所有商品要多少钱
+```
+curl -X GET http://elk1.linux.io:9200/es-shopping-data/_search?pretty  -H "Content-Type: application/json"  -d '
+{
+    "query": {
+        "match": {
+            "group":5
+        }
+    },
+    "aggs": {
+        "item_sum_shopping": {
+            "sum": {
+                "field": "price"
+            }
+        }
+    },
+    "size": 0
+}
+'
+```
+## 进阶
+### 集群常用API
+#### 集群迁移-reindex
+
+> [官网](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html): https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html
+
+-  同集群节点迁移
+```
+curl -X POST http://elk1.linux.io:9200/_reindex?pretty -H "Content-Type: application/json"  -d '
+{
+    "source": {
+        "index": "es-shopping-data"
+    },
+    "dest": {
+        "index": "es-shopping-data-new"
+    }
+}
+'
+# output 
+{
+  "took" : 2264,
+  "timed_out" : false,
+  "total" : 531,
+  "updated" : 0,
+  "created" : 531,
+  "deleted" : 0,
+  "batches" : 1,
+  "version_conflicts" : 0,
+  "noops" : 0,
+  "retries" : {
+    "bulk" : 0,
+    "search" : 0
+  },
+  "throttled_millis" : 0,
+  "requests_per_second" : -1.0,
+  "throttled_until_millis" : 0,
+  "failures" : [ ]
+}
+
+# 验证
+curl -X GET http://elk1.linux.io:9200/_cat/count/es-shopping-data-new?v
+epoch      timestamp count
+1714021975 05:12:55  531
+curl -X GET http://elk1.linux.io:9200/_cat/count/es-shopping-data?v    
+epoch      timestamp count
+1714021980 05:13:00  531
+```
+
+- 跨集群之间数据迁移，将集群A的数据迁移到集群B
+  - 集群A：http://elk1.linux.io:9200/
+  - 集群B: http://newes.linux.io:9200
+```
+# 1.在新的集群B的配置文件添加如下配置：
+# 表示添加远程主机的白名单，用于数据迁移信任的主机,其中192.168.1为集群B所在的IP地址段
+reindex.remote.whitelist: ["192.168.1.*:9200", "elk1.linux.io:9200"]
+
+# 2. 重启集群B上的es服务
+ systemctl  restart elasticsearch
+
+# 3. 在集群B上执行迁移数据命令
+curl -X POST http://newes.linux.io:9200/_reindex?pretty -H "Content-Type: application/json"  -d '
+{
+    "source": {
+        "index": "es-shopping-data",
+        "remote": {
+            "host": "http://elk1.linux.io:9200/"
+        },
+        "query": {
+            "match_all": {}
+        }
+    },
+    "dest": {
+        "index": "es-shopping-data"
+    }
+}
+'
+
+# 5. 验证
+curl -X GET http://elk1.linux.io:9200/_cat/count/es-shopping-data?v
+epoch      timestamp count
+1714024803 06:00:03  531
+curl -X GET http://newes.linux.io:9200/_cat/count/es-shopping-data?v
+epoch      timestamp count
+1714024813 06:00:13  531
+```
+
+#### 集群状态
+
+> [官网](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-state.html): https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-state.html
+
+- 查看集群的状态
+```
+curl http://elk1.linux.io:9200/_cluster/health 2> /dev/null |jq 
+{
+  "cluster_name": "dev-es7-cluster",
+  "status": "green",
+  "timed_out": false,
+  "number_of_nodes": 3,
+  "number_of_data_nodes": 3,
+  "active_primary_shards": 14,
+  "active_shards": 28,
+  "relocating_shards": 0,
+  "initializing_shards": 0,
+  "unassigned_shards": 0,
+  "delayed_unassigned_shards": 0,
+  "number_of_pending_tasks": 0,
+  "number_of_in_flight_fetch": 0,
+  "task_max_waiting_in_queue_millis": 0,
+  "active_shards_percent_as_number": 100
+}
+```
+| 字段 | 说明 |
+| -- | -- |
+| cluster_name | 集群名称 |
+| status |  集群的健康状态，基于其主分片和副本分片的状态 |
+| timed_out | 是否在参数false指定的时间段内返回响应（默认情况下30秒）。 |
+| number_of_nodes |    集群内的节点数。|
+| number_of_data_nodes |  作为专用数据节点的节点数 |
+| active_primary_shards |   可用主分片的数量 |
+| active_shards |  可用主分片和副本分片的总数 |
+| relocating_shards | 正在重定位的分片数 |
+| initializing_shards | 正在初始化的分片数 |
+| unassigned_shards | 未分配的分片数|
+| delayed_unassigned_shards | 分配因超时设置而延迟的分片数|
+| number_of_pending_tasks | 尚未执行的集群级别更改的数量 |
+| number_of_in_flight_fetch | 未完成的提取次数 |
+| task_max_waiting_in_queue_millis | 自最早启动的任务等待执行以来的时间（以毫秒为单位）|
+| active_shards_percent_as_number | 集群中活动分片的比率，以百分比表示 |
+
+```
+curl http://elk1.linux.io:9200/_cluster/health 2> /dev/null | jq .status
+"green"
+```
+```
+curl http://elk1.linux.io:9200/_cluster/health 2> /dev/null | jq .active_shards_percent_as_number
+100
+```
+- 集群状态数据
+```
+curl http://elk1.linux.io:9200/_cluster/state?pretty
+```
+- 只查看集群的节点信息
+```
+curl http://elk1.linux.io:9200/_cluster/state/nodes?pretty
+```
+
+- 查看nodes,version,routing_table这些信息，并且查看以"dev*"开头的所有索引
+```
+curl http://elk1.linux.io:9200/_cluster/state/nodes,version,routing_table/dev*?pretty
+```
+
+- 集群的统计信息
+```
+curl http://elk1.linux.io:9200/_cluster/stats
+```
+
+#### 集群的分片情况
+
+> [官网](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-allocation-explain.html): https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-allocation-explain.html
+
+查看集群的分片分配情况（allocation）
+- 集群分配解释API的目的是为集群中的分片分配提供解释。
+- 对于未分配的分片，解释 API 提供了有关未分配分片的原因的解释
+- 对于分配的分片，解释 API 解释了为什么分片保留在其当前节点上并且没有移动或重新平衡到另一个节点
+- 尝试诊断分片未分配的原因或分片继续保留在其当前节点上的原因
+
+- 分析students索引的0号分片未分配的原因
+```
+curl -X GET http://elk1.linux.io:9200/_cluster/allocation/explain
+{
+  "index": "studentsr",
+  "shard": 0,
+  "primary": true
+}
+```
+
+#### 集群分片重路由
+
+> [官网](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-reroute.html): https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-reroute.html
+
+
+reroute 命令允许手动更改集群中各个分片的分配,可以将分片从一个节点显式移动到另一个节点，可以取消分配，并且可以将未分配的分片显式分配给特定节点。
+
+- 将"students"索引的0号分片从elk1节点移动到elk2节点
+```
+curl -X POST http://newes.linux.io:9200/_cluster/reroute?pretty -H "Content-Type: application/json"  -d '
+{
+    "commands": [
+        {
+            "move": {
+                "index": "students",
+                "shard": 0,
+                "from_node": "elk1.linux.io",
+                "to_node": "elk2.linux.io"
+            }
+        }
+    ]
+}
+'
+```
+
+- 取消副本分片的分配，其副本会重新初始化分配
+```
+curl -X POST http://newes.linux.io:9200/_cluster/reroute?pretty -H "Content-Type: application/json"  -d '
+{
+    "commands": [
+        {
+            "cancel": {
+                "index": "students",
+                "shard": 0,
+                "node": "elk3.linux.io"
+            }
+        }
+    ]
+}
+
+'
+```
+
+
+
+#### 集群配置优先级
+
+> [官网](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-get-settings.html): https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-get-settings.html
+
+es集群的配置可以通过多种方式配置，不一样的配置方式按照以下优先顺序进行应用
+- Transient setting(临时配置，集群重启后失效)
+- Persistent setting(持久化配置，集群重启后依旧生效)
+- elasticsearch.yml setting(配置文件)
+- Default setting value(默认设置值)
+
+- 查询集群的所有配置信息
+```
+curl http://elk1.linux.io:9200/_cluster/settings?include_defaults=true&flat_settings=true
+```
+- 修改集群的配置
+
+```
+curl -X PUT http://newes.linux.io:9200/_cluster/settings -H "Content-Type: application/json"  -d '
+{
+    "transient": {
+        "cluster.routing.allocation.enable": "primaries"
+    }
+}
+'
+```
+
+### 集群角色
+
+### 文档写入流程
+
+![](../../images/doc.png)
+
+### 文档读取流程
+- 单个文档
+![](../../images/doc1.png)
+- 多个文档
+![](../../images/doc2.png)
+
+### 底层存储原理
+
+![](../../images/doc0.png)
+
+
+
+# Kibana
+
+## 安装
 
 **rpm包安装**
 
@@ -1372,8 +2274,88 @@ elasticsearch.hosts: ["http://192.168.122.136:9200"]
  systemctl  enable kibana --now
 ```
 
-- 访问
+- 访问 http://IP:5601
 
+# FileBeat
+
+## 安装
+
+### rpm 包安装
+
+- 下载
+```
+wget https://mirrors.tuna.tsinghua.edu.cn/elasticstack/7.x/yum/7.17.5/filebeat-7.17.5-x86_64.rpm
+```
+- 安装
+```
+yum install ./filebeat-7.17.5-x86_64.rpm 
+```
+
+
+### 预编译二进制包安装
+
+- 下载
+```
+wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.17.5-linux-x86_64.tar.gz
+```
+- 安装
+```
+tar -xf filebeat-7.17.5-linux-x86_64.tar.gz -C /usr/local/
+ln -sv /usr/local/filebeat-7.17.5-linux-x86_64/filebeat /usr/local/sbin/filebeat
+```
+
+- 配置
+
+filebeat 默认使用当前目录下的 `filebeat.yml` 文件作为配置文件，也可使用 `-c` 指定配置文件路径。配置文件一般需要按需求定制，所有这里提供标准输入到控制台配置，详细使用配置见下面的章节
+
+```
+cat config/01-stdin-to-console.yml 
+filebeat.inputs:
+- type: stdin
+
+output.console:
+  pretty: true
+```
+
+- 启动
+
+```
+filebeat  -e -c ./config/01-stdin-to-console.yml 
+```
+
+
+## 配置
+
+> [官网](https://www.elastic.co/guide/en/beats/filebeat/7.15/configuration-filebeat-options.html): https://www.elastic.co/guide/en/beats/filebeat/7.15/configuration-filebeat-options.html
+
+
+### Input 插件
+
+#### Tcp插件
+
+```
+filebeat.inputs:
+- type: tcp
+  max_message_size: 10MiB
+  host: "localhost:9000"
+output.console:
+  pretty: true
+```
+```
+# 验证
+ echo "AAAAAAAA" |nc localhost 9000
+```
+
+#### Log插件
+
+```
+
+```
+
+### Ouput 插件
+
+```
+```
 
 
 

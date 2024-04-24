@@ -7,12 +7,17 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: 运维文档
+   :caption: 日志采集
    :numbered:
 
-   chapter1.rst
-   elasticstack.md
+   post/elk/elasticstack.md
 
+.. toctree::
+   :maxdepth: 2
+   :caption: 云原生
+   :numbered:
+
+   post/kubernetes.md
 
 * :ref:`genindex`
 * :ref:`modindex`
