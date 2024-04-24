@@ -438,11 +438,6 @@ green  open   dev-index-01     cvRDzENCRtuaGievH2wo9g   1   1          0        
 green  open   dev-index-00     drO789YOT_GoKHV_sLwEyw   1   1          0            0       452b           226b
 ```
 
-- 查看单个索引
-```
-
-```
-
 **删除索引**
 
 - 删除单个索引
@@ -531,6 +526,63 @@ curl -X GET http://elk1.linux.io:9200/_cat/indices?v
 curl -X POST http://elk1.linux.io:9200/dev-index-01/_open
 ```
 
+**索引模板**
+
+索引模板是创建索引得一种方式，用户可以根据需求自定义对应的索引模板。
+
+- 查看所有的索引模板
+```
+curl -X GET http://elk1.linux.io:9200/_template
+```
+
+- 查看单个索引模板
+```
+curl -X GET http://elk1.linux.io:9200/_template/.monitoring-kibana
+```
+
+- 创建/修改索引模板
+
+索引如果匹配 `dev-docs-shopping*`， 则应用下面的索引模板，对已经存在得索引不生效
+```
+curl -X POST http://elk1.linux.io:9200/_template/my-index-01 -H 'Content-Type: application/json' -d  '
+{
+    "aliases": {
+        "website": {},
+        "shopapp": {},
+        "myshop": {}
+    },
+    "index_patterns": [
+        "dev-docs-shopping*"  
+    ],
+    "settings": {
+        "index": {
+            "number_of_shards": 3,
+            "number_of_replicas": 0
+        }
+    },
+    "mappings": {
+        "properties":{
+            "ip_addr": {
+                "type": "ip"
+            },
+            "access_time": {
+                "type": "date"
+            },
+            "address": {
+                "type" :"text"
+            },
+            "name": {
+                "type": "keyword"
+            }
+        }
+    }
+}
+'
+```
+- 删除索引模板:
+```
+curl -X DELETE http://elk1.linux.io:9200/_template/my-index-01
+```
 
 ### 文档基础操作
 
@@ -1287,6 +1339,12 @@ curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/jso
   ]
 }
 ```
+
+### DSL语句
+
+Elasticsearch 提供了基于JSON的完整 Query DSL（Domain Specific Language，领域特定语言）来定义查询。
+
+# TODO
 
 ## kibana
 
