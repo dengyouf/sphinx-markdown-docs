@@ -1288,6 +1288,12 @@ curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/jso
 }
 ```
 
+## kibana
+
+### 安装
+
+
+### 使用
 
 
 

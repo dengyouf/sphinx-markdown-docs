@@ -12,7 +12,6 @@
 
    chapter1.rst
    post/elk/elasticstack.md
-   post/elk/kibana.md
 
 
 * :ref:`genindex`
