@@ -11,7 +11,8 @@
    :numbered:
 
    chapter1.rst
-   elasticstack.md
+   post/elk/elasticstack.md
+   post/elk/kibana.md
 
 
 * :ref:`genindex`
