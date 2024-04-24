@@ -777,3 +777,521 @@ curl -X  POST http://elk1.linux.io:9200/_bulk -H 'Content-Type: application/json
 { "delete": { "_index": "students", "_id": "1002"} }
 '
 ```
+
+### Mapping配置
+
+### 分词器
+
+ElasticSearch 内置了分词器，如标准分词器、简单分词器、空白词器等。但这些分词器对我们最常使用的中文并不友好，不能按我们的语言习惯进行分词
+
+**standard 分词器**
+
+标准分词器模式使用空格和符号进行切割分词的。
+
+- 内置的标准分词器-分析英文
+```
+curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/json" -d '
+{
+    "analyzer": "standard",
+    "text": "My name is Dev Ops,  and I am 18 years old !"
+
+}'|jq
+
+# output
+{
+  "tokens": [
+    {
+      "token": "my",
+      "start_offset": 0,
+      "end_offset": 2,
+      "type": "<ALPHANUM>",
+      "position": 0
+    },
+    {
+      "token": "name",
+      "start_offset": 3,
+      "end_offset": 7,
+      "type": "<ALPHANUM>",
+      "position": 1
+    },
+    {
+      "token": "is",
+      "start_offset": 8,
+      "end_offset": 10,
+      "type": "<ALPHANUM>",
+      "position": 2
+    },
+    {
+      "token": "dev",
+      "start_offset": 11,
+      "end_offset": 14,
+      "type": "<ALPHANUM>",
+      "position": 3
+    },
+    {
+      "token": "ops",
+      "start_offset": 15,
+      "end_offset": 18,
+      "type": "<ALPHANUM>",
+      "position": 4
+    },
+    {
+      "token": "and",
+      "start_offset": 21,
+      "end_offset": 24,
+      "type": "<ALPHANUM>",
+      "position": 5
+    },
+    {
+      "token": "i",
+      "start_offset": 25,
+      "end_offset": 26,
+      "type": "<ALPHANUM>",
+      "position": 6
+    },
+    {
+      "token": "am",
+      "start_offset": 27,
+      "end_offset": 29,
+      "type": "<ALPHANUM>",
+      "position": 7
+    },
+    {
+      "token": "18",
+      "start_offset": 30,
+      "end_offset": 32,
+      "type": "<NUM>",
+      "position": 8
+    },
+    {
+      "token": "years",
+      "start_offset": 33,
+      "end_offset": 38,
+      "type": "<ALPHANUM>",
+      "position": 9
+    },
+    {
+      "token": "old",
+      "start_offset": 39,
+      "end_offset": 42,
+      "type": "<ALPHANUM>",
+      "position": 10
+    }
+  ]
+}
+```
+- 内置的标准分词器-分析中文并不友好
+```
+curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/json" -d '
+{
+    "analyzer": "standard",
+    "text": "我爱北京天安门, 毛主席万岁"
+
+}'|jq
+
+# output
+{
+  "tokens": [
+    {
+      "token": "我",
+      "start_offset": 0,
+      "end_offset": 1,
+      "type": "<IDEOGRAPHIC>",
+      "position": 0
+    },
+    {
+      "token": "爱",
+      "start_offset": 1,
+      "end_offset": 2,
+      "type": "<IDEOGRAPHIC>",
+      "position": 1
+    },
+    {
+      "token": "北",
+      "start_offset": 2,
+      "end_offset": 3,
+      "type": "<IDEOGRAPHIC>",
+      "position": 2
+    },
+    {
+      "token": "京",
+      "start_offset": 3,
+      "end_offset": 4,
+      "type": "<IDEOGRAPHIC>",
+      "position": 3
+    },
+    {
+      "token": "天",
+      "start_offset": 4,
+      "end_offset": 5,
+      "type": "<IDEOGRAPHIC>",
+      "position": 4
+    },
+    {
+      "token": "安",
+      "start_offset": 5,
+      "end_offset": 6,
+      "type": "<IDEOGRAPHIC>",
+      "position": 5
+    },
+    {
+      "token": "门",
+      "start_offset": 6,
+      "end_offset": 7,
+      "type": "<IDEOGRAPHIC>",
+      "position": 6
+    },
+    {
+      "token": "毛",
+      "start_offset": 9,
+      "end_offset": 10,
+      "type": "<IDEOGRAPHIC>",
+      "position": 7
+    },
+    {
+      "token": "主",
+      "start_offset": 10,
+      "end_offset": 11,
+      "type": "<IDEOGRAPHIC>",
+      "position": 8
+    },
+    {
+      "token": "席",
+      "start_offset": 11,
+      "end_offset": 12,
+      "type": "<IDEOGRAPHIC>",
+      "position": 9
+    },
+    {
+      "token": "万",
+      "start_offset": 12,
+      "end_offset": 13,
+      "type": "<IDEOGRAPHIC>",
+      "position": 10
+    },
+    {
+      "token": "岁",
+      "start_offset": 13,
+      "end_offset": 14,
+      "type": "<IDEOGRAPHIC>",
+      "position": 11
+    }
+  ]
+}
+```
+
+**IK分词器**
+
+ElasticSearch 内置了分词器，如标准分词器、简单分词器、空白词器等。但这些分词器对我们最常使用的中文并不友好，不能按我们的语言习惯进行分词。
+
+ik分词器就是一个标准的中文分词器。它可以根据定义的字典对域进行分词，并且支持用户配置自己的字典，所以它除了可以按通用的习惯分词外，我们还可以定制化分词。
+
+ik分词器是一个插件包，我们可以用插件的方式将它接入到ES。
+
+- 安装[ik分词器](https://github.com/infinilabs/analysis-ik)
+```
+wget https://github.com/infinilabs/analysis-ik/releases/download/v7.17.5/elasticsearch-analysis-ik-7.17.5.zip
+unzip elasticsearch-analysis-ik-7.17.5.zip  -d /data/apps/elasticsearch-7.17.5/plugins/ik
+systemctl  restart es7
+```
+
+- IK中文分词器-细粒度拆分
+```
+curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/json" -d '
+{
+    "analyzer": "ik_max_word",
+    "text": "我爱北京天安门, 毛主席万岁"
+
+}'|jq
+
+# output
+{
+  "tokens": [
+    {
+      "token": "我",
+      "start_offset": 0,
+      "end_offset": 1,
+      "type": "CN_CHAR",
+      "position": 0
+    },
+    {
+      "token": "爱",
+      "start_offset": 1,
+      "end_offset": 2,
+      "type": "CN_CHAR",
+      "position": 1
+    },
+    {
+      "token": "北京",
+      "start_offset": 2,
+      "end_offset": 4,
+      "type": "CN_WORD",
+      "position": 2
+    },
+    {
+      "token": "天安门",
+      "start_offset": 4,
+      "end_offset": 7,
+      "type": "CN_WORD",
+      "position": 3
+    },
+    {
+      "token": "天安",
+      "start_offset": 4,
+      "end_offset": 6,
+      "type": "CN_WORD",
+      "position": 4
+    },
+    {
+      "token": "门",
+      "start_offset": 6,
+      "end_offset": 7,
+      "type": "CN_CHAR",
+      "position": 5
+    },
+    {
+      "token": "毛主席万岁",
+      "start_offset": 9,
+      "end_offset": 14,
+      "type": "CN_WORD",
+      "position": 6
+    },
+    {
+      "token": "毛主席",
+      "start_offset": 9,
+      "end_offset": 12,
+      "type": "CN_WORD",
+      "position": 7
+    },
+    {
+      "token": "主席",
+      "start_offset": 10,
+      "end_offset": 12,
+      "type": "CN_WORD",
+      "position": 8
+    },
+    {
+      "token": "万岁",
+      "start_offset": 12,
+      "end_offset": 14,
+      "type": "CN_WORD",
+      "position": 9
+    },
+    {
+      "token": "万",
+      "start_offset": 12,
+      "end_offset": 13,
+      "type": "TYPE_CNUM",
+      "position": 10
+    },
+    {
+      "token": "岁",
+      "start_offset": 13,
+      "end_offset": 14,
+      "type": "COUNT",
+      "position": 11
+    }
+  ]
+}
+```
+
+> es集群需要在所有节点上都安装上此插件
+
+- IK中文分词器-粗粒度拆分
+```
+curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/json" -d '
+{
+    "analyzer": "ik_smart",
+    "text": "我爱北京天安门, 毛主席万岁"
+
+}'|jq
+
+#ouput
+{
+  "tokens": [
+    {
+      "token": "我",
+      "start_offset": 0,
+      "end_offset": 1,
+      "type": "CN_CHAR",
+      "position": 0
+    },
+    {
+      "token": "爱",
+      "start_offset": 1,
+      "end_offset": 2,
+      "type": "CN_CHAR",
+      "position": 1
+    },
+    {
+      "token": "北京",
+      "start_offset": 2,
+      "end_offset": 4,
+      "type": "CN_WORD",
+      "position": 2
+    },
+    {
+      "token": "天安门",
+      "start_offset": 4,
+      "end_offset": 7,
+      "type": "CN_WORD",
+      "position": 3
+    },
+    {
+      "token": "毛主席万岁",
+      "start_offset": 9,
+      "end_offset": 14,
+      "type": "CN_WORD",
+      "position": 4
+    }
+  ]
+}
+```
+
+- 自定义IK分词器的字典
+```
+# 1. 进入到IK分词器的插件配置目录
+cd /data/apps/elasticsearch-7.17.5/plugins/ik/config
+
+# 2. 自定义字典
+cat > net-word.dic <<'EOF'
+德玛西亚
+艾欧尼亚
+亚索
+上号
+带你飞
+贼6
+EOF
+
+# 3. 加载自定义字典
+vim IKAnalyzer.cfg.xml
+<properties>
+        ...
+        <!--用户可以在这里配置自己的扩展字典 -->
+        <entry key="ext_dict">net-word.dic</entry>
+        ...
+</properties>
+              
+# 4. 重启es集群
+systemctl  restart es7
+```
+```
+curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/json" -d '
+{
+    "analyzer": "ik_smart",
+    "text": "嗨，哥们! 上号，我德玛西亚和艾欧尼亚都有号! 我亚索贼6，肯定能带你飞!!!"
+}
+'
+
+#output
+{
+  "tokens": [
+    {
+      "token": "嗨",
+      "start_offset": 0,
+      "end_offset": 1,
+      "type": "CN_CHAR",
+      "position": 0
+    },
+    {
+      "token": "哥们",
+      "start_offset": 2,
+      "end_offset": 4,
+      "type": "CN_WORD",
+      "position": 1
+    },
+    {
+      "token": "上号",
+      "start_offset": 6,
+      "end_offset": 8,
+      "type": "CN_WORD",
+      "position": 2
+    },
+    {
+      "token": "我",
+      "start_offset": 9,
+      "end_offset": 10,
+      "type": "CN_CHAR",
+      "position": 3
+    },
+    {
+      "token": "德玛西亚",
+      "start_offset": 10,
+      "end_offset": 14,
+      "type": "CN_WORD",
+      "position": 4
+    },
+    {
+      "token": "和",
+      "start_offset": 14,
+      "end_offset": 15,
+      "type": "CN_CHAR",
+      "position": 5
+    },
+    {
+      "token": "艾欧尼亚",
+      "start_offset": 15,
+      "end_offset": 19,
+      "type": "CN_WORD",
+      "position": 6
+    },
+    {
+      "token": "都有",
+      "start_offset": 19,
+      "end_offset": 21,
+      "type": "CN_WORD",
+      "position": 7
+    },
+    {
+      "token": "号",
+      "start_offset": 21,
+      "end_offset": 22,
+      "type": "CN_CHAR",
+      "position": 8
+    },
+    {
+      "token": "我",
+      "start_offset": 24,
+      "end_offset": 25,
+      "type": "CN_CHAR",
+      "position": 9
+    },
+    {
+      "token": "亚索",
+      "start_offset": 25,
+      "end_offset": 27,
+      "type": "CN_WORD",
+      "position": 10
+    },
+    {
+      "token": "贼6",
+      "start_offset": 27,
+      "end_offset": 29,
+      "type": "CN_WORD",
+      "position": 11
+    },
+    {
+      "token": "肯定能",
+      "start_offset": 30,
+      "end_offset": 33,
+      "type": "CN_WORD",
+      "position": 12
+    },
+    {
+      "token": "带你飞",
+      "start_offset": 33,
+      "end_offset": 36,
+      "type": "CN_WORD",
+      "position": 13
+    }
+  ]
+}
+```
+
+
+
+
+
+
+
+
