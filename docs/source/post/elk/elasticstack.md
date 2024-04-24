@@ -1292,8 +1292,30 @@ curl -X GET http://elk1.linux.io:9200/_analyze -H "Content-Type: application/jso
 
 ### 安装
 
+**rpm包安装**
 
-### 使用
+- 下载软件包
+``` 
+wget https://mirrors.tuna.tsinghua.edu.cn/elasticstack/7.x/yum/7.17.5/kibana-7.17.5-x86_64.rpm
+```
+- 安装
+``` 
+yum  localinstall ./kibana-7.17.5-x86_64.rpm
+```
+- 配置
+``` 
+vim /etc/kibana/kibana.yml
+server.port: 5601
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://192.168.122.136:9200"]
+```
+- 启动
+```
+ systemctl  enable kibana --now
+```
+
+- 访问
+
 
 
 
